@@ -1,0 +1,37 @@
+{# templates/partials/hero.twig #}
+<div>
+  <section
+    class="relative bg-gradient-to-r from-gray-50 to-gray-400 flex flex-col justify-center items-center text-center py-24 overflow-hidden md:h-120 z-30"
+  >
+
+    <img
+      src="/assets/circle1.svg"
+      alt="circle svg"
+      class="absolute top-10 left-10 w-32 h-32 rounded-full opacity-90"
+    />
+   
+    <div class="max-w-[1440px] mx-auto px-6 z-10">
+      <h2 class="text-4xl md:text-5xl font-bold text-gray-800 mb-4">
+        Manage Your Tickets Easily
+      </h2>
+      <p class="text-gray-600 mb-8 max-w-2xl mx-auto">
+        A modern and multi-framework ticket management app to streamline your workflow
+        efficiently.
+      </p>
+      <div class="flex flex-col md:flex-row gap-2 justify-center">
+        <a href="signup.php" class="border bg-gray-800 px-3 py-2 rounded-lg hover:bg-primary text-white transition">
+          Get Started
+        </a>
+        <a href="login.php" class="px-6 py-3 border border-gray-400 rounded-lg">
+          Login
+        </a>
+      </div>
+    </div>
+
+    {# Wavy SVG Background #}
+    <div class="absolute bottom-0 left-0 w-full overflow-hidden leading-none">
+      <img src="/assets/wavy.svg" alt="wavy svg" />
+    </div>
+  </section>
+  
+</div>

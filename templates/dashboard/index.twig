@@ -1,0 +1,102 @@
+{% extends 'base.twig' %}
+
+{% block content %}
+<main class="max-w-[1440px]">
+
+  <div class="mx-auto min-h-screen bg-gray-50 p-4">
+    <div class="space-y-8">
+      <!-- Stats Section -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="bg-white flex flex-col justify-center items-center w-64 md:w-full p-6 rounded-xl shadow md:text-center">
+          <h3 class="text-base sm:text-lg font-semibold text-gray-600">Total Tickets</h3>
+          <p class="text-2xl sm:text-3xl font-bold text-blue-500">{{ stats.total }}</p>
+        </div>
+        <div class="bg-white flex flex-col justify-center items-center w-64 md:w-full p-6 rounded-xl shadow md:text-center">
+          <h3 class="text-base sm:text-lg font-semibold text-gray-600">Open Tickets</h3>
+          <p class="text-2xl sm:text-3xl font-bold text-green-500">{{ stats.open }}</p>
+        </div>
+        <div class="bg-white flex flex-col justify-center items-center w-64 md:w-full p-6 rounded-xl shadow md:text-center">
+          <h3 class="text-base sm:text-lg font-semibold text-gray-600">Resolved</h3>
+          <p class="text-2xl sm:text-3xl font-bold text-gray-500">{{ stats.closed }}</p>
+        </div>
+      </div>
+
+      <!-- Quick Actions Section -->
+      <div class="bg-white rounded-xl max-w-80 md:max-w-60 lg:max-w-screen shadow p-6">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-4">
+          <h2 class="text-lg sm:text-xl font-semibold text-gray-800">Quick Actions</h2>
+          <div class="flex flex-wrap gap-3">
+            {# Uncomment if you want a new ticket button #}
+            {# <button class="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 transition">+ New Ticket</button> #}
+            <a href="/ticket" class="border border-gray-300 px-4 py-2 rounded-md text-gray-600 hover:bg-gray-100 transition">
+              View all tickets
+            </a>
+          </div>
+        </div>
+
+        <!-- Recent Tickets Table -->
+        {% include 'dashboard/recent_tickets.twig' with {'tickets': recentTickets} %}
+      </div>
+    </div>
+
+    <!-- Modal -->
+    {% if showModal %}
+      {% include 'dashboard/ticket_modal.twig' with {'editing': editing} %}
+    {% endif %}
+
+  </div>
+</main>
+{% endblock %}
+
+
+
+
+{% extends 'base.twig' %}
+
+{% block content %}
+<main class="max-w-[1440px]">
+
+  <div class="mx-auto min-h-screen bg-gray-50 p-4">
+    <div class="space-y-8">
+      <!-- Stats Section -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="bg-white flex flex-col justify-center items-center w-64 md:w-full p-6 rounded-xl shadow md:text-center">
+          <h3 class="text-base sm:text-lg font-semibold text-gray-600">Total Tickets</h3>
+          <p class="text-2xl sm:text-3xl font-bold text-blue-500">{{ stats.total }}</p>
+        </div>
+        <div class="bg-white flex flex-col justify-center items-center w-64 md:w-full p-6 rounded-xl shadow md:text-center">
+          <h3 class="text-base sm:text-lg font-semibold text-gray-600">Open Tickets</h3>
+          <p class="text-2xl sm:text-3xl font-bold text-green-500">{{ stats.open }}</p>
+        </div>
+        <div class="bg-white flex flex-col justify-center items-center w-64 md:w-full p-6 rounded-xl shadow md:text-center">
+          <h3 class="text-base sm:text-lg font-semibold text-gray-600">Resolved</h3>
+          <p class="text-2xl sm:text-3xl font-bold text-gray-500">{{ stats.closed }}</p>
+        </div>
+      </div>
+
+      <!-- Quick Actions Section -->
+      <div class="bg-white rounded-xl max-w-80 md:max-w-60 lg:max-w-screen shadow p-6">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-4">
+          <h2 class="text-lg sm:text-xl font-semibold text-gray-800">Quick Actions</h2>
+          <div class="flex flex-wrap gap-3">
+            {# Uncomment if you want a new ticket button #}
+            {# <button class="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 transition">+ New Ticket</button> #}
+            <a href="/ticket" class="border border-gray-300 px-4 py-2 rounded-md text-gray-600 hover:bg-gray-100 transition">
+              View all tickets
+            </a>
+          </div>
+        </div>
+
+        <!-- Recent Tickets Table -->
+        {% include 'dashboard/recent_tickets.twig' with {'tickets': recentTickets} %}
+      </div>
+    </div>
+
+    <!-- Modal -->
+    {% if showModal %}
+      {% include 'dashboard/ticket_modal.twig' with {'editing': editing} %}
+    {% endif %}
+
+  </div>
+</main>
+{% endblock %}

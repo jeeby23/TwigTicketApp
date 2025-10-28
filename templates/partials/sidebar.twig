@@ -1,0 +1,66 @@
+<aside id="sidebar" class="fixed top-0 left-0 z-50 h-screen flex flex-col bg-gray-700 text-white transition-all duration-300 ease-in-out w-60">
+
+  <!-- Header -->
+  <div class="flex items-center gap-3 cursor-pointer p-3 rounded-md hover:bg-gray-200 hover:text-black transition-colors duration-200" onclick="toggleSidebar()">
+    <span id="sidebar-icon" class="material-symbols-outlined text-2xl hover:text-black">keyboard_double_arrow_left</span>
+    <span id="sidebar-title" class="font-semibold text-lg">TicketApp</span>
+  </div>
+
+  <!-- Navigation -->
+  <nav class="flex flex-col gap-1 mt-4 flex-1 overflow-y-auto">
+    <a href="/dashboard.php" class="flex items-center gap-3 p-3 rounded-md hover:bg-gray-200 hover:text-black transition">
+      <span class="material-symbols-outlined text-xl">dashboard</span>
+      <span class="sidebar-label">Dashboard</span>
+    </a>
+
+    <a href="/tickets.php" class="flex items-center gap-3 p-3 rounded-md hover:bg-gray-200 hover:text-black transition">
+      <span class="material-symbols-outlined text-xl">confirmation_number</span>
+      <span class="sidebar-label">Tickets</span>
+    </a>
+  </nav>
+
+  <!-- Logout -->
+  <button id="logoutBtn" class="flex items-center gap-3 p-3 rounded-md hover:bg-red-400 transition text-white font-medium shrink-0">
+    <span class="material-symbols-outlined text-xl">logout</span>
+    <span id="logout-label" class="sidebar-label">Logout</span>
+  </button>
+
+</aside>
+
+<script>
+  let collapsed = false;
+
+  function toggleSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const title = document.getElementById('sidebar-title');
+    const icon = document.getElementById('sidebar-icon');
+    const logoutLabel = document.getElementById('logout-label');
+    const labels = document.querySelectorAll('.sidebar-label');
+
+    collapsed = !collapsed;
+
+    if (collapsed) {
+      sidebar.classList.remove('w-60');
+      sidebar.classList.add('w-10');
+      title.style.display = 'none';
+      logoutLabel.style.display = 'none';
+      labels.forEach(el => el.style.display = 'none');
+      icon.textContent = 'double_arrow';
+    } else {
+      sidebar.classList.remove('w-10');
+      sidebar.classList.add('w-60');
+      title.style.display = 'inline';
+      logoutLabel.style.display = 'inline';
+      labels.forEach(el => el.style.display = 'inline');
+      icon.textContent = 'keyboard_double_arrow_left';
+    }
+  }
+
+  const logoutBtn = document.getElementById('logoutBtn');
+  logoutBtn.addEventListener('click', () => {
+    if(confirm("Are you sure you want to logout?")){
+      localStorage.removeItem('ticketapp_session');
+      window.location.href = '/login.php'; // Adjust to your login page
+    }
+  });
+</script>

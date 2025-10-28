@@ -1,0 +1,42 @@
+<div class="flex flex-col">
+  <nav class="bg-white shadow-md z-50 relative">
+    <div class="max-w-[1440px] mx-auto px-6 py-4 flex justify-between items-center">
+      <a href="/" class="text-2xl font-bold text-primary">TicketApp</a>
+
+      <button id="menu-toggle" class="text-gray-700 md:hidden focus:outline-none">
+        <img id="hamburger-icon" src="/assets/hamburger.svg" alt="hamburger svg" class="w-6 h-6" />
+        <img id="close-icon" src="/assets/close.svg" alt="close svg" class="h-6 w-6 hidden" />
+      </button>
+
+      <!-- Links (Desktop) -->
+      <div class="hidden md:flex space-x-4">
+        <a href="/" class="px-4 py-2 text-gray-700 hover:text-primary transition">Home</a>
+        <a href="/login.php" class="px-4 py-2 text-gray-700 hover:text-primary transition">Login</a>
+        <a href="/signup.php" class="bg-primary px-4 py-2 rounded-lg hover:bg-secondary transition">Get Started</a>
+      </div>
+    </div>
+
+    <!-- Mobile Menu -->
+    <div
+      id="mobile-menu"
+      class="absolute top-full left-0 w-full md:hidden px-6 pb-4 flex flex-col space-y-2 bg-white shadow-lg z-40 hidden"
+    >
+      <a href="/" class="text-gray-700 hover:text-primary transition">Home</a>
+      <a href="/login.php" class="text-gray-700 hover:text-primary transition">Login</a>
+      <a href="/signup.php" class="py-2 rounded-lg hover:bg-secondary transition">Get Started</a>
+    </div>
+  </nav>
+</div>
+
+<script>
+  const menuToggle = document.getElementById('menu-toggle');
+  const mobileMenu = document.getElementById('mobile-menu');
+  const hamburgerIcon = document.getElementById('hamburger-icon');
+  const closeIcon = document.getElementById('close-icon');
+
+  menuToggle.addEventListener('click', () => {
+    mobileMenu.classList.toggle('hidden');
+    hamburgerIcon.classList.toggle('hidden');
+    closeIcon.classList.toggle('hidden');
+  });
+</script>

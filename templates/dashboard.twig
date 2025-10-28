@@ -1,0 +1,254 @@
+{% extends "base.twig" %}
+
+{% block content %}
+<main class="max-w-[1440px]">
+  <div class="mx-auto min-h-screen bg-gray-50 p-4">
+    <div class="space-y-8">
+
+      <!-- Stats Section -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="bg-white flex flex-col justify-center items-center w-64 md:w-full p-6 rounded-xl shadow md:text-center">
+          <h3 class="text-base sm:text-lg font-semibold text-gray-600">Total Tickets</h3>
+          <p id="statTotal" class="text-2xl sm:text-3xl font-bold text-blue-500">0</p>
+        </div>
+        <div class="bg-white flex flex-col justify-center items-center w-64 md:w-full p-6 rounded-xl shadow md:text-center">
+          <h3 class="text-base sm:text-lg font-semibold text-gray-600">Open Tickets</h3>
+          <p id="statOpen" class="text-2xl sm:text-3xl font-bold text-green-500">0</p>
+        </div>
+        <div class="bg-white flex flex-col justify-center items-center w-64 md:w-full p-6 rounded-xl shadow md:text-center">
+          <h3 class="text-base sm:text-lg font-semibold text-gray-600">Resolved</h3>
+          <p id="statClosed" class="text-2xl sm:text-3xl font-bold text-gray-500">0</p>
+        </div>
+      </div>
+
+      <!-- Quick Actions Section -->
+      <div class="bg-white rounded-xl max-w-80 md:max-w-60 lg:max-w-[100vw] shadow p-6">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-4">
+          <h2 class="text-lg sm:text-xl font-semibold text-gray-800">Quick Actions</h2>
+          <div class="flex flex-wrap gap-3">
+            <a href="/tickets.php" class="border border-gray-300 px-4 py-2 rounded-md text-gray-600 hover:bg-gray-100 transition">
+              View all tickets
+            </a>
+            <button
+              onclick="openModal()"
+              class="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 transition"
+            >
+              + New Ticket
+            </button>
+          </div>
+        </div>
+
+        <!-- Recent Tickets Table -->
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border border-gray-200 rounded-xl">
+            <thead class="bg-gray-100 text-gray-700">
+              <tr>
+                <th class="px-4 py-3 text-sm">Title</th>
+                <th class="px-4 py-3 text-sm">Status</th>
+                <th class="px-4 py-3 text-sm">Created</th>
+                <th class="px-4 py-3 text-sm text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="recentTickets" class="divide-y divide-gray-200 text-sm"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal -->
+    <div
+      id="ticketModal"
+      class="hidden fixed inset-0 bg-black/40 flex items-center justify-center z-50"
+    >
+      <div class="bg-white w-full max-w-md p-6 rounded-2xl shadow-xl">
+        <h2 id="modalTitle" class="text-2xl font-semibold mb-4">Create New Ticket</h2>
+
+        <form id="ticketForm" class="space-y-4">
+          <div>
+            <label class="block text-gray-700 text-sm font-medium mb-1">Title</label>
+            <input
+              id="titleInput"
+              type="text"
+              class="w-full border border-gray-300 rounded-xl px-3 py-2 focus:ring-2 focus:ring-blue-400 outline-none"
+              placeholder="Enter ticket title"
+            />
+            <p id="titleError" class="text-red-500 text-xs mt-1 hidden">Title required</p>
+          </div>
+
+          <div>
+            <label class="block text-gray-700 text-sm font-medium mb-1">Description</label>
+            <textarea
+              id="descInput"
+              class="w-full border border-gray-300 rounded-xl px-3 py-2 focus:ring-2 focus:ring-blue-400 outline-none"
+              placeholder="Enter ticket details"
+            ></textarea>
+          </div>
+
+          <div>
+            <label class="block text-gray-700 text-sm font-medium mb-1">Status</label>
+            <select
+              id="statusInput"
+              class="w-full border border-gray-300 rounded-xl px-3 py-2 focus:ring-2 focus:ring-blue-400 outline-none"
+            >
+              <option value="open">Open</option>
+              <option value="in_progress">In Progress</option>
+              <option value="closed">Closed</option>
+            </select>
+          </div>
+
+          <div class="flex justify-end space-x-3 pt-3">
+            <button
+              type="button"
+              onclick="closeModal()"
+              class="px-4 py-2 bg-gray-200 rounded-xl hover:bg-gray-300 transition"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              class="px-4 py-2 bg-blue-500 text-white rounded-xl hover:bg-blue-600 transition"
+            >
+              Save
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+  const STORAGE_KEY = 'ticketapp_tickets';
+  let tickets = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+  let editingId = null;
+
+  const statTotal = document.getElementById('statTotal');
+  const statOpen = document.getElementById('statOpen');
+  const statClosed = document.getElementById('statClosed');
+  const recentTickets = document.getElementById('recentTickets');
+  const modal = document.getElementById('ticketModal');
+  const titleInput = document.getElementById('titleInput');
+  const descInput = document.getElementById('descInput');
+  const statusInput = document.getElementById('statusInput');
+  const ticketForm = document.getElementById('ticketForm');
+  const modalTitle = document.getElementById('modalTitle');
+
+  function updateStats() {
+    statTotal.textContent = tickets.length;
+    statOpen.textContent = tickets.filter(t => t.status === 'open').length;
+    statClosed.textContent = tickets.filter(t => t.status === 'closed').length;
+  }
+
+  function renderRecentTickets() {
+    recentTickets.innerHTML = '';
+    const recent = [...tickets].slice(-5).reverse();
+    if (recent.length === 0) {
+      recentTickets.innerHTML = '<tr><td colspan="4" class="p-4 text-center text-gray-500">No tickets yet</td></tr>';
+      return;
+    }
+    recent.forEach(ticket => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td class="px-4 py-3">${ticket.title}</td>
+        <td class="px-4 py-3">
+          <span class="px-3 py-1 rounded-full text-xs font-semibold ${getStatusColor(ticket.status)}">
+            ${ticket.status}
+          </span>
+        </td>
+        <td class="px-4 py-3 text-gray-500 text-xs">${ticket.createdAt}</td>
+        <td class="px-4 py-3 text-right space-x-2">
+          <button onclick="editTicket(${ticket.id})" class="text-blue-500 hover:underline text-xs">Edit</button>
+          <button onclick="deleteTicket(${ticket.id})" class="text-red-500 hover:underline text-xs">Delete</button>
+        </td>
+      `;
+      recentTickets.appendChild(tr);
+    });
+  }
+
+  function getStatusColor(status) {
+    switch (status) {
+      case 'open':
+        return 'bg-green-100 text-green-600';
+      case 'in_progress':
+        return 'bg-amber-100 text-amber-600';
+      case 'closed':
+        return 'bg-gray-200 text-gray-600';
+      default:
+        return '';
+    }
+  }
+
+  function openModal(ticket = null) {
+    modal.classList.remove('hidden');
+    if (ticket) {
+      modalTitle.textContent = 'Edit Ticket';
+      titleInput.value = ticket.title;
+      descInput.value = ticket.description;
+      statusInput.value = ticket.status;
+      editingId = ticket.id;
+    } else {
+      modalTitle.textContent = 'Create New Ticket';
+      titleInput.value = '';
+      descInput.value = '';
+      statusInput.value = 'open';
+      editingId = null;
+    }
+  }
+
+  function closeModal() {
+    modal.classList.add('hidden');
+    editingId = null;
+  }
+
+  ticketForm.addEventListener('submit', e => {
+    e.preventDefault();
+    const title = titleInput.value.trim();
+    const desc = descInput.value.trim();
+    const status = statusInput.value;
+
+    if (!title) {
+      alert('Title is required');
+      return;
+    }
+
+    if (editingId) {
+      const index = tickets.findIndex(t => t.id === editingId);
+      tickets[index] = { ...tickets[index], title, description: desc, status };
+    } else {
+      const newTicket = {
+        id: Date.now(),
+        title,
+        description: desc,
+        status,
+        createdAt: new Date().toLocaleString(),
+      };
+      tickets.push(newTicket);
+    }
+
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(tickets));
+    closeModal();
+    loadTickets();
+  });
+
+  function editTicket(id) {
+    const ticket = tickets.find(t => t.id === id);
+    if (ticket) openModal(ticket);
+  }
+
+  function deleteTicket(id) {
+    if (confirm('Are you sure you want to delete this ticket?')) {
+      tickets = tickets.filter(t => t.id !== id);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(tickets));
+      loadTickets();
+    }
+  }
+
+  function loadTickets() {
+    tickets = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+    updateStats();
+    renderRecentTickets();
+  }
+
+  document.addEventListener('DOMContentLoaded', loadTickets);
+</script>
+{% endblock %}

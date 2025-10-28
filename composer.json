@@ -1,0 +1,21 @@
+{
+    "name": "mac/twig-ticket",
+    "description": "ticketmanagement/mujeeb-abdulrahman",
+    "type": "project",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Mac\\TwigTicket\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "jeeby mujeeb",
+            "email": "shola.mujeeb@gmail.com"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {
+        "twig/twig": "^3.21"
+    }
+}

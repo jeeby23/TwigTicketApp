@@ -1,0 +1,139 @@
+{# templates/login.twig #}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
+  <title>Login | TicketApp</title>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+  {% include 'partials/navbar.twig' %}
+
+  <div
+    class="bg-cover bg-no-repeat bg-center min-h-screen w-full flex items-center justify-center px-4"
+    style="background-image: url('/assets/AuthBackground.png');"
+  >
+    <div
+      class="backdrop-blur-md bg-white/70 shadow-xl rounded-2xl w-full max-w-md p-8 md:p-10 flex flex-col justify-center"
+    >
+      <div class="text-center mb-8">
+        <h1 class="text-3xl font-bold text-gray-800 mb-2">Welcome Back</h1>
+        <p class="text-gray-600 text-sm">We're glad to see you again. Log in to your account.</p>
+      </div>
+
+      <form id="loginForm" class="space-y-6">
+        <div>
+          <label for="email" class="block text-gray-700 font-medium mb-2 text-sm">Email</label>
+          <input
+            id="email"
+            type="email"
+            placeholder="Enter your email"
+            class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-400"
+          />
+          <p id="emailError" class="text-red-500 text-sm mt-1 hidden"></p>
+        </div>
+
+        <div class="relative">
+          <label for="password" class="block text-gray-700 font-medium mb-2 text-sm">Password</label>
+          <input
+            id="password"
+            type="password"
+            placeholder="Enter your password"
+            class="w-full border border-gray-300 rounded-xl px-4 py-3 pr-10 focus:outline-none focus:ring-2 focus:ring-blue-400"
+          />
+          <button
+            type="button"
+            id="togglePassword"
+            class="absolute right-3 top-[38px] text-gray-500 hover:text-gray-700 focus:outline-none"
+          >
+            👁
+          </button>
+          <p id="passwordError" class="text-red-500 text-sm mt-1 hidden"></p>
+        </div>
+
+        <button
+          id="loginBtn"
+          type="submit"
+          class="w-full bg-gray-400 text-white font-semibold rounded-xl py-3 hover:bg-gray-600 transition duration-300 shadow-md"
+        >
+          Log In
+        </button>
+
+        <p class="text-sm text-gray-700 mt-6 text-center">
+          Don't have an account?
+          <a href="signup.php" class="text-blue-500 font-semibold hover:underline">Sign Up</a>
+        </p>
+      </form>
+    </div>
+  </div>
+
+  {% include 'partials/footer.twig' %}
+
+  <script>
+    const loginForm = document.getElementById('loginForm');
+    const loginBtn = document.getElementById('loginBtn');
+    const togglePassword = document.getElementById('togglePassword');
+    const passwordInput = document.getElementById('password');
+    let showPassword = false;
+
+    togglePassword.addEventListener('click', () => {
+      showPassword = !showPassword;
+      passwordInput.type = showPassword ? 'text' : 'password';
+    });
+
+    loginForm.addEventListener('submit', (e) => {
+  e.preventDefault();
+  loginBtn.disabled = true;
+
+  const email = document.getElementById('email').value.trim();
+  const password = passwordInput.value.trim();
+  let hasError = false;
+
+  // Email validation
+  if (!email) {
+    document.getElementById('emailError').textContent = "Email is required";
+    document.getElementById('emailError').classList.remove('hidden');
+    hasError = true;
+  } else {
+    document.getElementById('emailError').classList.add('hidden');
+  }
+
+  // Password validation
+  if (!password) {
+    document.getElementById('passwordError').textContent = "Password is required";
+    document.getElementById('passwordError').classList.remove('hidden');
+    hasError = true;
+  } else {
+    document.getElementById('passwordError').classList.add('hidden');
+  }
+
+  if (hasError) {
+    loginBtn.disabled = false;
+    return;
+  }
+
+  // Check user login in localStorage
+  let users = JSON.parse(localStorage.getItem('ticketapp_users') || '[]');
+  const user = users.find(u => u.email === email && u.password === password);
+
+  if (!user) {
+    alert('Invalid email or password. Please try again.');
+    loginBtn.disabled = false;
+    return;
+  }
+
+  // Store session
+  localStorage.setItem('ticketapp_session', JSON.stringify(user));
+  alert(`Welcome back, ${user.name}!`);
+
+  // ✅ Redirect to dashboard
+  window.location.href = "dashboard.php";
+});
+  </script>
+
+</body>
+</html>

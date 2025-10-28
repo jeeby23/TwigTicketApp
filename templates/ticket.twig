@@ -1,0 +1,209 @@
+{% extends "base.twig" %}
+
+{% block content %}
+<div class="max-w-[1440px] mx-auto px-4 py-10">
+
+  <div class="flex justify-between items-center mb-8">
+    <h1 class="md:text-3xl font-bold text-gray-800">Ticket Management</h1>
+    <button
+      onclick="openModal()"
+      class="bg-blue-500 hover:bg-blue-600 text-sm text-white font-semibold py-2 px-5 rounded-xl shadow-md transition"
+    >
+      + New Ticket
+    </button>
+  </div>
+
+  <!-- Ticket Cards -->
+  <div id="ticketList" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+    <!-- Tickets will be rendered here dynamically -->
+  </div>
+
+  <p id="emptyMessage" class="hidden text-center text-gray-500 mt-20 text-sm">
+    No tickets yet. Click <span class="font-semibold">"New Ticket"</span> to create one.
+  </p>
+
+  <!-- Create Ticket Modal -->
+  <div
+    id="ticketModal"
+    class="hidden fixed inset-0 bg-black/40 bg-opacity-50 flex items-center justify-center z-50"
+  >
+    <div class="bg-white w-full max-w-md p-6 rounded-2xl shadow-xl">
+      <h2 class="text-2xl font-semibold mb-4">Create New Ticket</h2>
+
+      <form id="ticketForm" class="space-y-4">
+        <div>
+          <label class="block text-gray-700 text-sm font-medium mb-1">Title</label>
+          <input
+            id="titleInput"
+            type="text"
+            class="w-full border border-gray-300 rounded-xl px-3 py-2 focus:ring-2 focus:ring-blue-400 outline-none"
+            placeholder="Enter ticket title"
+          />
+          <p id="titleError" class="text-red-500 text-xs mt-1 hidden">Title required</p>
+        </div>
+
+        <div>
+          <label class="block text-gray-700 text-sm font-medium mb-1">Description</label>
+          <textarea
+            id="descInput"
+            class="w-full border border-gray-300 rounded-xl px-3 py-2 focus:ring-2 focus:ring-blue-400 outline-none"
+            placeholder="Enter ticket details"
+          ></textarea>
+        </div>
+
+        <div>
+          <label class="block text-gray-700 text-sm font-medium mb-1">Status</label>
+          <select
+            id="statusInput"
+            class="w-full border border-gray-300 rounded-xl px-3 py-2 focus:ring-2 focus:ring-blue-400 outline-none"
+          >
+            <option value="open">Open</option>
+            <option value="in_progress">In Progress</option>
+            <option value="closed">Closed</option>
+          </select>
+          <p id="statusError" class="text-red-500 text-xs mt-1 hidden">Status required</p>
+        </div>
+
+        <div class="flex justify-end space-x-3 pt-3">
+          <button
+            type="button"
+            onclick="closeModal()"
+            class="px-4 py-2 bg-gray-200 rounded-xl hover:bg-gray-300 transition"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            class="px-4 py-2 bg-blue-500 text-white rounded-xl hover:bg-blue-600 transition"
+          >
+            Create Ticket
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- JS Logic -->
+<script>
+  const STORAGE_KEY = 'ticketapp_tickets';
+  let tickets = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+
+  const ticketList = document.getElementById('ticketList');
+  const ticketModal = document.getElementById('ticketModal');
+  const emptyMessage = document.getElementById('emptyMessage');
+  const ticketForm = document.getElementById('ticketForm');
+  const titleInput = document.getElementById('titleInput');
+  const descInput = document.getElementById('descInput');
+  const statusInput = document.getElementById('statusInput');
+  const titleError = document.getElementById('titleError');
+  const statusError = document.getElementById('statusError');
+
+  function renderTickets() {
+    ticketList.innerHTML = '';
+    if (tickets.length === 0) {
+      emptyMessage.classList.remove('hidden');
+      return;
+    }
+    emptyMessage.classList.add('hidden');
+
+    tickets.forEach(ticket => {
+      const card = document.createElement('div');
+      card.className = 'bg-white p-5 rounded-2xl shadow-md border';
+
+      card.innerHTML = `
+        <h2 class="text-xl font-semibold text-gray-800 mb-2">${ticket.title}</h2>
+        <p class="text-gray-600 text-sm mb-3">${ticket.description || 'No description'}</p>
+        <span class="inline-block px-3 py-1 text-xs font-semibold rounded-full ${getStatusColor(ticket.status)}">
+          ${ticket.status}
+        </span>
+        <div class="text-xs text-gray-500 mt-3">Created: ${ticket.createdAt}</div>
+        <div class="mt-4 flex justify-end space-x-2">
+          <button
+            onclick="deleteTicket(${ticket.id})"
+            class="bg-red-100 text-red-600 px-3 py-1 rounded-lg hover:bg-red-200 transition"
+          >
+            Delete
+          </button>
+        </div>
+      `;
+      ticketList.appendChild(card);
+    });
+  }
+
+  function getStatusColor(status) {
+    switch (status) {
+      case 'open':
+        return 'bg-green-100 text-green-600';
+      case 'in_progress':
+        return 'bg-amber-100 text-amber-600';
+      case 'closed':
+        return 'bg-gray-200 text-gray-600';
+      default:
+        return '';
+    }
+  }
+
+  function openModal() {
+    ticketModal.classList.remove('hidden');
+  }
+
+  function closeModal() {
+    ticketModal.classList.add('hidden');
+    titleInput.value = '';
+    descInput.value = '';
+    statusInput.value = 'open';
+    titleError.classList.add('hidden');
+    statusError.classList.add('hidden');
+  }
+
+  ticketForm.addEventListener('submit', function (e) {
+    e.preventDefault();
+
+    const title = titleInput.value.trim();
+    const description = descInput.value.trim();
+    const status = statusInput.value.trim();
+
+    let hasError = false;
+    if (!title) {
+      titleError.classList.remove('hidden');
+      hasError = true;
+    } else {
+      titleError.classList.add('hidden');
+    }
+
+    if (!status) {
+      statusError.classList.remove('hidden');
+      hasError = true;
+    } else {
+      statusError.classList.add('hidden');
+    }
+
+    if (hasError) return;
+
+    const newTicket = {
+      id: Date.now(),
+      title,
+      description,
+      status,
+      createdAt: new Date().toLocaleString()
+    };
+
+    tickets.push(newTicket);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(tickets));
+
+    closeModal();
+    renderTickets();
+  });
+
+  function deleteTicket(id) {
+    if (confirm('Delete this ticket?')) {
+      tickets = tickets.filter(t => t.id !== id);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(tickets));
+      renderTickets();
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', renderTickets);
+</script>
+{% endblock %}

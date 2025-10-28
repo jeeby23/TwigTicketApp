@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}Ticket App{% endblock %}</title>
+   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 min-h-screen">
+
+  <div class="flex min-h-screen max-w-[1440px] mx-auto relative">
+
+    <!-- Sidebar -->
+    {% include 'partials/sidebar.twig' %}
+
+    <!-- Main Content -->
+    <div class="flex-1 ml-20 md:ml-60 transition-all duration-300 p-6 relative">
+      
+      <!-- Navbar -->
+      {% include 'partials/navbar.twig' %}
+      
+      <main>
+        {% block content %}{% endblock %}
+      </main>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  {% include 'partials/footer.twig' %}
+
+  <style>
+    .fade-enter-active,
+    .fade-leave-active {
+      transition: opacity 0.3s ease;
+    }
+    .fade-enter-from,
+    .fade-leave-to {
+      opacity: 0;
+    }
+  </style>
+</body>
+</html>
