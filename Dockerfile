@@ -1,23 +1,30 @@
-# Use an official PHP image with Apache
+# Use official PHP image with Apache
 FROM php:8.2-apache
 
-# Set working directory inside the container
+# Set working directory
 WORKDIR /var/www/html
 
-# Install necessary PHP extensions
-RUN docker-php-ext-install pdo pdo_mysql
+# Install system dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    git \
+    unzip \
+    zip \
+    libzip-dev \
+    libonig-dev \
+    libxml2-dev \
+    && docker-php-ext-install zip pdo pdo_mysql mbstring \
+    && a2enmod rewrite \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
-# Enable Apache mod_rewrite (Twig often uses pretty URLs)
-RUN a2enmod rewrite
-
-# Copy the app into the container
+# Copy your app
 COPY . /var/www/html/
 
-# Install Composer dependencies
+# Install Composer
 COPY --from=composer:2.7 /usr/bin/composer /usr/bin/composer
+
+# Run Composer install
 RUN composer install --no-dev --optimize-autoloader
 
-# Set Apache document root to the public folder
-ENV APACHE_DOCUMENT_ROOT /var/www/html/public
-
-# Update Apache config to use the public directory as web root
+# Set Apache document root
+ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
